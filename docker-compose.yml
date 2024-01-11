@@ -1,0 +1,30 @@
+# You can easily switch between different databases by changing the value of COMPOSE_PROFILES in the .env file.
+services:
+  web:
+    build: { context: "./SqlPageDockerContainerConfig" }
+    ports:
+      - "8082:8080"
+    volumes:
+      - ./www:/var/www
+    depends_on:
+      - mariadb
+    environment:
+      DATABASE_URL: mysql://root:Password123!@mariadb/sqlpage
+      WEB_ROOT: /var/www
+
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8088:8080
+
+  mariadb:
+    profiles: ["mariadb"]
+    ports: ["3308:3306"]
+    image: mariadb
+    environment:
+      MYSQL_ROOT_PASSWORD: Password123!
+      MYSQL_DATABASE: sqlpage
+    volumes:
+      - ./BD/init.sql:/docker-entrypoint-initdb.d/0_init.sql
